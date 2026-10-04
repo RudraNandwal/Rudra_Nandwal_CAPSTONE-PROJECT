@@ -25,7 +25,8 @@ discount_pct INT,
 payment_method VARCHAR(10) NOT NULL,
 rating INT,
 returned INT NOT NULL DEFAULT 0,
-FOREIGN KEY (customer_id) REFERENCES customers(customer_id), FOREIGN KEY (product_id) REFERENCES products(product_id)
+FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
+FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
 
 
