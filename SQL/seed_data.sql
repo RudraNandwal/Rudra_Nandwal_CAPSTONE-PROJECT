@@ -67,6 +67,9 @@ VALUES
 ('P15', 'Tea Tree Body Wash', 'PersonalCare', 349),
 ('P16', 'Aloe Vera Gel', 'PersonalCare', 199);
 
+#THE SQL TABLE INPORT WIZARD WAS REMOVING THE ROWS WHICH HAD BLANK VALUES, SO 
+#FOR THAT I HAVE TAKEN HELP OF AI TO INPUT 'NULL' ON THE PLACE OF BLANK VALUES iIN THE CSV FILE AND THEN USED INSERT FUNCTION.
+  
 INSERT INTO orders (order_id, customer_id, product_id, order_date, quantity, discount_pct, payment_method, rating, returned)
 VALUES
 ('O0001', 'C012', 'P04', '2026-03-18', 2, 10, 'upi', 2, 0),
