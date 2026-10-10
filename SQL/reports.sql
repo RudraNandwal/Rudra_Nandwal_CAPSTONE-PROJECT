@@ -130,7 +130,7 @@ ORDER BY category_revenue DESC;
 #             C030     	  Anika
 #             C031	      Aditya
 #             C036	      Aisha
-#             C041   	    Ayaan
+#             C041   	  Ayaan
 #             C044	      Aria
 SELECT
     customer_id, name
@@ -143,6 +143,7 @@ WHERE name LIKE 'A%';
 #             Referral
 #                Ad
 #              Social
+    
 SELECT DISTINCT acquisition_source
 FROM customers;
 
@@ -150,6 +151,7 @@ FROM customers;
 # OUTPUT:    loyalty_tier     customer_count
 #               Gold               28
 #              Silver              17
+    
   # ADDING THE TIER COLUMN.
 ALTER TABLE customers
 ADD COLUMN loyalty_tier VARCHAR(10);
