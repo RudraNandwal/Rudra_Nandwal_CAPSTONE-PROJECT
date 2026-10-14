@@ -235,3 +235,134 @@ print("After excluding these outliers, March 2026 becomes the highest month with
 print("Therefore, January's higher total is misleading due to the two bulk orders, while March is the actual peak month after excluding them.")
 
 
+# GENERATING findings.json
+
+import os
+os.makedirs("narrator", exist_ok=True)
+os.makedirs("analysis", exist_ok=True)
+print("Folders created successfully.")
+
+# CHECKING EXISTING VARIABLES
+
+required_variables = [
+    "merged",
+    "merged_analysis",
+    "monthly_revenue_with_outliers",
+    "monthly_revenue_without_outliers"
+]
+
+for var in required_variables:
+    print(f"{var}: {'Available' if var in globals() else 'Not available'}")
+
+# AFTER RUNNING THE ABOVE CODE, WE FOUND THAT merged_analysis IS UNAVAILABLE.
+# RECREATING merged_analysis
+
+merged_analysis = orders_clean.merge(
+    products,
+    on="product_id",
+    how="left"
+).merge(
+    customers,
+    on="customer_id",
+    how="left"
+)
+
+print("Merged analysis shape:", merged_analysis.shape)
+print("Missing values in analysis:")
+print(merged_analysis.isna().sum())
+
+# RECHECKING AVAILABLITY OF ALL THE REQUIED VARIABLES
+
+required_variables = [
+    "merged",
+    "merged_analysis",
+    "monthly_revenue_with_outliers",
+    "monthly_revenue_without_outliers"
+]
+
+for var in required_variables:
+    print(f"{var}: {'Available' if var in globals() else 'Not available'}")
+
+# GENERATING narrator/findings.json
+# THIS WILL CALCULATE ALL REQUIED FINDINGS AND SAVE THEM IN NARRATOR FOLDER
+import json
+import os
+import pandas as pd
+
+# Calculate cleaned and raw revenue
+cleaned_total_revenue = round(merged["order_value"].sum(), 2)
+
+raw_total_revenue = round(cleaned_total_revenue + duplicate_reconciliation_delta, 2)
+
+# Duplicate reconciliation difference
+duplicate_reconciliation_delta = round(
+    raw_total_revenue - cleaned_total_revenue, 2
+)
+
+# Return rate by payment method
+payment_returns = (
+    merged.groupby("payment_method")["returned"]
+    .mean()
+    .mul(100)
+    .round(1)
+    .to_dict()
+)
+
+# Highest-risk payment method and city tier
+segment_analysis = (
+    merged.groupby(["payment_method", "city_tier"])["returned"]
+    .mean()
+    .mul(100)
+    .round(1)
+)
+
+highest_risk_index = segment_analysis.idxmax()
+highest_risk_rate = float(segment_analysis.max())
+
+# True peak month
+peak_month = str(monthly_revenue_without_outliers.idxmax())
+
+peak_revenue = round(
+    float(monthly_revenue_without_outliers.max()), 2
+)
+
+# Outlier-inflated month
+monthly_difference = (
+    monthly_revenue_with_outliers
+    - monthly_revenue_without_outliers
+).round(2)
+
+outlier_month = str(monthly_difference.idxmax())
+
+findings = {
+    "cleaned_total_revenue_inr": cleaned_total_revenue,
+    "raw_total_revenue_inr": raw_total_revenue,
+    "duplicate_reconciliation_delta_inr": duplicate_reconciliation_delta,
+    "return_rate_by_payment": payment_returns,
+    "highest_risk_segment": {
+        "payment_method": highest_risk_index[0],
+        "city_tier": int(highest_risk_index[1]),
+        "return_rate_pct": highest_risk_rate
+    },
+    "true_peak_month": {
+        "month": peak_month,
+        "revenue_inr": peak_revenue
+    },
+    "outlier_inflated_month": {
+        "month": outlier_month,
+        "apparent_revenue_inr": round(
+            float(monthly_revenue_with_outliers.loc[outlier_month]), 2
+        ),
+        "corrected_revenue_inr": round(
+            float(monthly_revenue_without_outliers.loc[outlier_month]), 2
+        )
+    }
+}
+
+os.makedirs("narrator", exist_ok=True)
+
+with open("narrator/findings.json", "w") as file:
+    json.dump(findings, file, indent=4)
+
+print(json.dumps(findings, indent=4))
+print("\nfindings.json created successfully.")
