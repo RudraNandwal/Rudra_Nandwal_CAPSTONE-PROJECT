@@ -3,19 +3,13 @@ import matplotlib.pyplot as plt
 import os
 
 
-# =========================================================
 # LOAD DATA
-# =========================================================
-
 orders = pd.read_csv("orders.csv")
 customers = pd.read_csv("customers.csv")
 products = pd.read_csv("products.csv")
 
 
-# =========================================================
 # CLEAN PAYMENT METHODS
-# =========================================================
-
 orders["payment_method"] = (
     orders["payment_method"]
     .str.strip()
@@ -23,10 +17,7 @@ orders["payment_method"] = (
 )
 
 
-# =========================================================
 # REMOVE DUPLICATES
-# =========================================================
-
 orders_clean = orders.drop_duplicates(
     subset=[
         "customer_id",
@@ -42,10 +33,7 @@ orders_clean = orders.drop_duplicates(
 ).copy()
 
 
-# =========================================================
 # MERGE DATA
-# =========================================================
-
 merged = (
     orders_clean
     .merge(products, on="product_id", how="left")
@@ -53,10 +41,7 @@ merged = (
 )
 
 
-# =========================================================
 # CALCULATE ORDER VALUE
-# =========================================================
-
 merged["order_value"] = (
     merged["quantity"]
     * merged["price"]
@@ -68,11 +53,9 @@ merged["order_value"] = (
 os.makedirs("visualizations", exist_ok=True)
 
 
-# =========================================================
-# VISUALIZATION 1
-# RETURN RATE BY PAYMENT METHOD
-# =========================================================
+# VISUALIZATION 1 ===
 
+# RETURN RATE BY PAYMENT METHOD
 return_analysis = (
     merged.groupby("payment_method")["returned"]
     .mean()
@@ -188,10 +171,9 @@ plt.savefig(
 plt.close()
 
 
-# =========================================================
-# VISUALIZATION 2
+# VISUALIZATION 2 ===
+
 # OUTLIER-CORRECTED MONTHLY REVENUE
-# =========================================================
 
 # Remove quantity outliers from Task 6
 merged_without_outliers = merged[
@@ -229,9 +211,7 @@ peak_revenue = monthly_revenue.max()
 months = monthly_revenue.index.astype(str)
 
 
-# =========================================================
 # CREATE REVENUE CHART
-# =========================================================
 
 fig, ax = plt.subplots(figsize=(11, 6))
 
@@ -254,8 +234,8 @@ ax.fill_between(
     alpha=0.12,
     color="#2A9D8F"
 )
-# ADDING PEAK MONTH TEXT
 
+# Adding peak month text
 peak_position = monthly_revenue_without_outliers.index.get_loc(monthly_revenue_without_outliers.idxmax())
 peak_revenue = float(monthly_revenue_without_outliers.max())
 ax.annotate(
@@ -332,7 +312,6 @@ ax.spines["right"].set_visible(False)
 # Rotate month labels
 plt.xticks(rotation=0)
 
-
 plt.tight_layout()
 
 plt.savefig(
@@ -342,11 +321,8 @@ plt.savefig(
 )
 
 plt.close()
-
-
-# =========================================================
+                                                    
 # FINAL OUTPUT
-# =========================================================
 
 print("Visualizations created successfully.")
 print("Peak month:", peak_month)
