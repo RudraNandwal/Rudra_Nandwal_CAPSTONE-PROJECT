@@ -53,7 +53,7 @@ merged["order_value"] = (
 os.makedirs("visualizations", exist_ok=True)
 
 
-# VISUALIZATION 1 ===
+# VISUALIZATION 1 
 
 # RETURN RATE BY PAYMENT METHOD
 return_analysis = (
@@ -144,13 +144,13 @@ ax.grid(
 ax.set_axisbelow(True)
 
 
-# Remove unnecessary borders
+# Removing unnecessary borders
 ax.spines["top"].set_visible(False)
 ax.spines["right"].set_visible(False)
 ax.spines["left"].set_visible(False)
 
 
-# Add small insight
+# Adding small insight
 ax.text(
     0,
     -0.18,
@@ -171,30 +171,30 @@ plt.savefig(
 plt.close()
 
 
-# VISUALIZATION 2 ===
+# VISUALIZATION 2 
 
 # OUTLIER-CORRECTED MONTHLY REVENUE
 
-# Remove quantity outliers from Task 6
+# Removing the quantity outliers from Task 6
 merged_without_outliers = merged[
     ~merged["order_id"].isin(["O0011", "O0098"])
 ].copy()
 
 
-# Convert date
+# Converting date
 merged_without_outliers["order_date"] = pd.to_datetime(
     merged_without_outliers["order_date"]
 )
 
 
-# Create year-month
+# Creating year-month
 merged_without_outliers["year_month"] = (
     merged_without_outliers["order_date"]
     .dt.to_period("M")
 )
 
 
-# Calculate monthly revenue
+# Calculating monthly revenue
 monthly_revenue = (
     merged_without_outliers
     .groupby("year_month")["order_value"]
@@ -202,16 +202,16 @@ monthly_revenue = (
 )
 
 
-# Find actual peak
+# Finding actual peak
 peak_month = monthly_revenue.idxmax()
 peak_revenue = monthly_revenue.max()
 
 
-# Convert labels to strings
+# Converting labels to strings
 months = monthly_revenue.index.astype(str)
 
 
-# CREATE REVENUE CHART
+# CREATING REVENUE CHART
 
 fig, ax = plt.subplots(figsize=(11, 6))
 
@@ -261,7 +261,7 @@ ax.scatter(
 )
 
 
-# Add revenue values above every point
+# Adding revenue values above every point
 for x, y in enumerate(monthly_revenue.values):
     ax.text(
         x,
